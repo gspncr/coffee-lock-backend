@@ -14,7 +14,7 @@ function oneTimeDB(){
 function viewLock(){
     var lastLock = lookupLastLock(new Date());
     var delta = lockDelta(lastLock)
-    if (delta <= 30 || fetchRedemptions() == 5){
+    if (delta <= 35 || fetchRedemptions() == 5){
         return {
             countdownToCoffee: timeToCoffee(delta), lastLockedBy: lastCaffinatedUser(),
             coffeesRedeemedToday: fetchRedemptions(), asOf: getLastKnownISO(), timeOfUnlock: timeToUnlock(),
@@ -35,14 +35,14 @@ function requestLock(user, requestTime){
     var delta = lockDelta(lastLock);
     checkDatesMatch(user);
     //console.log('delta', delta);
-    if (delta <= 30){
+    if (delta <= 35){
         //deny lock request
         return {
             lockRequest: 'denied', yourUser: user, time: requestTime, 
             countdownToCoffee: timeToCoffee(delta), lastLockedBy: lastCaffinatedUser(),
             coffeesRedeemedToday: fetchRedemptions(), timeOfUnlock: timeToUnlock(),
             timestampOfUnlock: epochToUnlock(),
-            explanation: 'another user had a coffee within last 30 minutes or > 5 drinks redeemed'
+            explanation: 'another user had a coffee within last 35 minutes or > 5 drinks redeemed'
         }
     } else if (fetchRedemptions() == 5){
         return {
@@ -71,7 +71,7 @@ function lookupLastLock(requestTime){
 
 function epochToUnlock(){
     var lastLocked = db.get('timeOfRequest');
-    var stampToUnlock = lastLocked + 1800000;
+    var stampToUnlock = lastLocked + 2100000;
     return stampToUnlock
 }
 
@@ -85,7 +85,7 @@ function lockDelta(time){
 
 function timeToCoffee(delta){
     //return the time until another coffee can be redeemed
-    return 30 - delta + ' minutes'
+    return 35 - delta + ' minutes'
 }
 
 function checkDatesMatch(user){
@@ -171,7 +171,7 @@ function lastCaffinatedUser(){
 function timeToUnlock(){
     //timestamp until no longer locked
     lastLock = lookupLastLock();
-    timestampToUnlock = lastLock + 1800000;
+    timestampToUnlock = lastLock + 2100000;
     unlockingTime = new Date(timestampToUnlock).toLocaleString('en-GB', { timeZone: 'Europe/London'})
     //console.log(new Date(unlockingTime).getTimezoneOffset());
     return unlockingTime
